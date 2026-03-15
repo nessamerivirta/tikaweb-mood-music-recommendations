@@ -12,4 +12,5 @@ Toiminnot:
 - Käyttäjät voivat myös lisätä arvosteluja (arvosana 1-10 sekä kommentti).
 - Käyttäjät pystyvät tykkäämään biiseistä ja biisit voidaan järjestää haussa tykkäysten määrän perusteella
 - Käyttäjäsivulla näkyy käyttäjän lisätyt biisit sekä arvostelut
+
 Pääasiallinen tietokohde on musiikkiehdotus ja toissijainen tietokohde on arvostelu. Tykkäykset lisäominaisuutena.
