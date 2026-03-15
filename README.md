@@ -1,6 +1,7 @@
 # tikaweb-project-music
 Musiikki ehdotukset
 Sovelluksen tarkoituksena on auttaa käyttäjiä löytämään uusia biisejä erityisesti tunnelman perusteella
+
 Toiminnot:
 - Käyttäjä pystyy luomaan tunnuksen ja kirjautumaan sisään sovellukseen
 - Kirjautuneet käyttäjät pystyvät lisäämään, muokkaamaan sekä poistamaan biisejä
