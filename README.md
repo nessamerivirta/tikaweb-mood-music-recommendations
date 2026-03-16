@@ -1,4 +1,4 @@
-# tikaweb-project-music
+# tikaweb-mood-music-recommendations
 Musiikki ehdotukset
 Sovelluksen tarkoituksena on auttaa käyttäjiä löytämään uusia biisejä erityisesti tunnelman perusteella
 
