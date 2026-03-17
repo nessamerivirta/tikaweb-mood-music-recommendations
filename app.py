@@ -1,10 +1,13 @@
 import sqlite3
 from flask import Flask
-from flask import redirect, render_template, request
+from flask import redirect, render_template, request, session
 from werkzeug.security import generate_password_hash
+from werkzeug.security import check_password_hash
 import db
+import config
 
 app = Flask(__name__)
+app.secret_key = config.secret_key
 
 def create_db():
     connect = sqlite3.connect("database.db")
@@ -28,8 +31,20 @@ def index():
 def register():
     return render_template("register.html")
 
-@app.route("/login")
+@app.route("/login", methods=["GET", "POST"])
 def login():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+    
+        sql = "SELECT password_hash FROM users WHERE username = ?"
+        password_hash = db.query(sql, [username])[0][0]
+
+        if check_password_hash(password_hash, password):
+            session["username"] = username
+            return redirect("/")
+        else:
+            return "ERROR: wrong username or password"
     return render_template("login.html")
 
 @app.route("/create", methods=["POST"])
@@ -48,6 +63,11 @@ def create():
         return "ERROR: username taken"
 
     return "Account created"
+
+@app.route("/logout")
+def logout():
+    del session["username"]
+    return redirect("/")
 
 if __name__ == "__main__":
     create_db()
