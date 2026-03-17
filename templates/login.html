@@ -4,18 +4,27 @@
     <title>Log In</title>
 </head>
 <body>
+    {% if session.username %}
+    <p>
+        Olet kirjautunut nimellä {{ session.username }}
+    </p>
+    <p>
+        <a href="/logout">Kirjaudu ulos</a>
+    </p>
+    {% else %}
     <h1>Log in:</h1>
-    <form action="/result" method="post">
+    <form action="/login" method="post">
         <p>
             Insert username:
             <input type="text" name="username" />
         </p>
         <p>
             Insert password:
-            <input type="text" name="password" />
+            <input type="password" name="password" />
         </p>
         <input type="submit" value="Next" />
     </form>
+    {% endif %}
 </body>
 
 </html>
