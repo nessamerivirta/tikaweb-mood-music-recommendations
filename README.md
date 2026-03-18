@@ -14,4 +14,4 @@ Toiminnot:
 - Käyttäjät pystyvät tykkäämään biiseistä ja biisit voidaan järjestää haussa tykkäysten määrän perusteella
 - Käyttäjäsivulla näkyy käyttäjän lisätyt biisit sekä arvostelut
 
-Pääasiallinen tietokohde on musiikkiehdotus ja toissijainen tietokohde on arvostelu. Tykkäykset lisäominaisuutena.
+Pääasiallinen tietokohde on musiikkiehdotus ja toissijainen tietokohde on arvostelu. Tykkäykset lisäominaisuutena
