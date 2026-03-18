@@ -1,19 +1,21 @@
 import sqlite3
 
 def connect_db():
-    return sqlite3.connect("database.db")
+    conn = sqlite3.connect("database.db")
+    conn.row_factory = sqlite3.Row
+    return conn
 
 def query(sql, params=()):
     conn = connect_db()
-    cursor = conn.cursor()
-    cursor.execute(sql, params)
-    results = cursor.fetchall()
+    cur = conn.cursor()
+    cur.execute(sql, params)
+    rows = cur.fetchall()
     conn.close()
-    return results
+    return [dict(row) for row in rows]
 
 def execute(sql, params=()):
     conn = connect_db()
-    cursor = conn.cursor()
-    cursor.execute(sql, params)
+    cur = conn.cursor()
+    cur.execute(sql, params)
     conn.commit()
     conn.close()
