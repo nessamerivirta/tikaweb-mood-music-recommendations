@@ -23,9 +23,20 @@ def create_db():
     connect.commit()
     connect.close()
 
+create_db()
+
+def get_posts():
+    sql = """SELECT artist, song, comment, image_path, sent_at
+             FROM posts p
+             ORDER BY sent_at DESC
+             JOIN users u
+             ON p.user_id = u.id"""
+    return db.query(sql)
+
 @app.route("/")
 def index():
-    return render_template("index.html")
+    posts = get_posts()
+    return render_template("index.html", posts=posts)
 
 @app.route("/register")
 def register():
@@ -38,11 +49,15 @@ def login():
         password = request.form["password"]
     
         sql = "SELECT password_hash FROM users WHERE username = ?"
-        password_hash = db.query(sql, [username])[0][0]
+        results = db.query(sql, [username])
+        if not results:
+            return "ERROR: wrong username or password"
+        password_hash = results[0][0]
+
 
         if check_password_hash(password_hash, password):
             session["username"] = username
-            return redirect("/")
+            return redirect("/frontpage")
         else:
             return "ERROR: wrong username or password"
     return render_template("login.html")
@@ -62,13 +77,11 @@ def create():
     except sqlite3.IntegrityError:
         return "ERROR: username taken"
 
-    return "Account created"
+    return redirect("/frontpage")
 
 @app.route("/logout")
 def logout():
     del session["username"]
     return redirect("/")
 
-if __name__ == "__main__":
-    create_db()
-    app.run(debug=True)
+app.run(debug=True)
