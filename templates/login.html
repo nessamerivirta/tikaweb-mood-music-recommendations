@@ -5,27 +5,25 @@
 </head>
 <body>
     {% if session.username %}
-    <p>
-        Olet kirjautunut nimellä {{ session.username }}
-    </p>
-    <p>
-        <a href="/logout">Kirjaudu ulos</a>
-    </p>
+        <p>You are already logged in as {{ session.username }}.</p>
+        <p><a href="{{ url_for('frontpage') }}">Go to music posts</a></p>
+        <p><a href="{{ url_for('logout') }}">Log out</a></p>
     {% else %}
-    <h1>Log in:</h1>
-    <form action="/login" method="post">
-        <p>
-            Insert username:
-            <input type="text" name="username" />
-        </p>
-        <p>
-            Insert password:
-            <input type="password" name="password" />
-        </p>
-        <input type="submit" value="Next" />
-    </form>
+        <h1>Log in:</h1>
+        {% if error %}
+            <p style="color:red">{{ error }}</p>
+        {% endif %}
+        <form action="{{ url_for('login') }}" method="post">
+            <p>
+                Insert username:
+                <input type="text" name="username" />
+            </p>
+            <p>
+                Insert password:
+                <input type="password" name="password" />
+            </p>
+            <input type="submit" value="Next" />
+        </form>
     {% endif %}
-    </p>
 </body>
-
 </html>
