@@ -3,6 +3,8 @@ from flask import Flask
 from flask import redirect, render_template, request, session
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
+from werkzeug.utils import secure_filename
+import os
 import db
 import config
 
@@ -35,7 +37,8 @@ def create_postdb():
                 comment TEXT,
                 image_path TEXT,
                 sent_at TEXT,
-                user_id INTEGER REFERENCES users
+                user_id INTEGER REFERENCES users,
+                picture BLOB
         )
     ''')
     connect.commit()
@@ -45,17 +48,16 @@ create_userdb()
 create_postdb()
 
 def get_posts():
-    sql = """SELECT artist, song, comment, image_path, sent_at
+    sql = """SELECT p.id, p.artist, p.song, p.comment, p.image_path, p.sent_at, u.username
              FROM posts p
              JOIN users u
              ON p.user_id = u.id
              ORDER BY p.sent_at DESC"""
     return db.query(sql)
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def index():
-    posts = get_posts()
-    return render_template("index.html", posts=posts)
+    return render_template("index.html")
 
 @app.route("/register")
 def register():
@@ -63,23 +65,55 @@ def register():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    error = None
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
-    
-        sql = "SELECT password_hash FROM users WHERE username = ?"
+
+        sql = "SELECT id, password_hash FROM users WHERE username = ?"
         results = db.query(sql, [username])
         if not results:
-            return "ERROR: wrong username or password"
-        password_hash = results[0][0]
-
-
-        if check_password_hash(password_hash, password):
-            session["username"] = username
-            return redirect("/frontpage")
+            error = "ERROR: wrong username or password"
         else:
-            return "ERROR: wrong username or password"
-    return render_template("login.html")
+            row = results[0]
+            user_id = row["id"]
+            password_hash = row["password_hash"]
+            if check_password_hash(password_hash, password):
+                session["username"] = username
+                session["user_id"] = user_id
+                return redirect("/frontpage")
+            else:
+                error = "ERROR: wrong username or password"
+
+
+    return render_template("login.html", error=error)
+
+@app.route("/frontpage", methods=["GET", "POST"])
+def frontpage():
+    if "user_id" not in session:
+        return redirect("/login")
+
+    if request.method == "POST":
+        artist = request.form["artist"]
+        song = request.form["song"]
+        comment = request.form["comment"]
+        user_id = session["user_id"]
+
+        image_file = request.files.get("image")
+        image_path = None
+        if image_file:
+            filename = secure_filename(image_file.filename)
+            os.makedirs('static/uploads', exist_ok=True)
+            image_path = os.path.join('static/uploads', filename)
+            image_file.save(image_path)
+
+        sql = """INSERT INTO posts (artist, song, comment, image_path, sent_at, user_id)
+                 VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, ?)"""
+        db.execute(sql, [artist, song, comment, image_path, user_id])
+        return redirect("/frontpage")
+
+    posts = get_posts()
+    return render_template("frontpage.html", posts=posts, username=session.get("username"))
 
 @app.route("/create", methods=["POST"])
 def create():
@@ -96,7 +130,7 @@ def create():
     except sqlite3.IntegrityError:
         return "ERROR: username taken"
 
-    return redirect("/frontpage")
+    return redirect("/")
 
 @app.route("/logout")
 def logout():
