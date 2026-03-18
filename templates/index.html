@@ -8,17 +8,32 @@
 </head>
 
 <body>
-  <h1><i>MusicByMood</i></h1>
-  <h2>Are you ready to explore new music?</h2>
-  <p>
-    Please, log in or register a new account
+  <h1 style="text-align: center;"><i>MoodMusic</i></h1>
+  <h2 style="text-align: center;">Are you ready to explore new music?</h2>
+  <p style="text-align: center;">
+    Please, log in or register a new account to share your taste
   </p>
+  <div style="text-align: center;">
     <form action="{{ url_for('login') }}" method="get">
         <button type="submit">Log In</button>
     </form>
+
     <form action="{{ url_for('register') }}" method="get">
         <button type="submit">Register</button>
     </form>
+  </div>
+  {% for post posts%}
+    <p>
+    <strong>Artist:</strong> {{ post.artist }}<br />
+      <strong>Song:</strong> {{ post.song }}<br />
+      <strong>Comment:</strong> {{ post.comment }}<br />
+      {% if post.image_path %}
+      <img src="{{ post.image_path }}" alt="Image" width="200"><br />
+      {% endif %}
+      <em>Posted at {{ post.sent_at }}</em>
+    </p>
+    <hr />
+  {% endfor %}
 </body>
 
 </html>
