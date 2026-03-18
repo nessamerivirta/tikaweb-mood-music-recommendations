@@ -9,7 +9,7 @@ import config
 app = Flask(__name__)
 app.secret_key = config.secret_key
 
-def create_db():
+def create_userdb():
     connect = sqlite3.connect("database.db")
     cursor = connect.cursor()
 
@@ -23,14 +23,33 @@ def create_db():
     connect.commit()
     connect.close()
 
-create_db()
+def create_postdb():
+    connect = sqlite3.connect("database.db")
+    cursor = connect.cursor()
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS posts (
+                id INTEGER PRIMARY KEY,
+                artist TEXT,
+                song TEXT,
+                comment TEXT,
+                image_path TEXT,
+                sent_at TEXT,
+                user_id INTEGER REFERENCES users
+        )
+    ''')
+    connect.commit()
+    connect.close()
+
+create_userdb()
+create_postdb()
 
 def get_posts():
     sql = """SELECT artist, song, comment, image_path, sent_at
              FROM posts p
-             ORDER BY sent_at DESC
              JOIN users u
-             ON p.user_id = u.id"""
+             ON p.user_id = u.id
+             ORDER BY p.sent_at DESC"""
     return db.query(sql)
 
 @app.route("/")
