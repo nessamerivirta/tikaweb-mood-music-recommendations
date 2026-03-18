@@ -1,39 +1,33 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MoodMusic</title>
+    <title>MoodMusic</title>
 </head>
-
 <body>
-  <h1 style="text-align: center;"><i>MoodMusic</i></h1>
-  <h2 style="text-align: center;">Are you ready to explore new music?</h2>
-  <p style="text-align: center;">
-    Please, log in or register a new account to share your taste
-  </p>
-  <div style="text-align: center;">
-    <form action="{{ url_for('login') }}" method="get">
-        <button type="submit">Log In</button>
-    </form>
-
-    <form action="{{ url_for('register') }}" method="get">
-        <button type="submit">Register</button>
-    </form>
-  </div>
-  {% for post posts%}
-    <p>
-    <strong>Artist:</strong> {{ post.artist }}<br />
-      <strong>Song:</strong> {{ post.song }}<br />
-      <strong>Comment:</strong> {{ post.comment }}<br />
-      {% if post.image_path %}
-      <img src="{{ post.image_path }}" alt="Image" width="200"><br />
-      {% endif %}
-      <em>Posted at {{ post.sent_at }}</em>
+    <h1 style="text-align: center;"><i>MoodMusic</i></h1>
+    <h2 style="text-align: center;">Are you ready to explore new music?</h2>
+    <p style="text-align: center;">
+        Please, log in or register a new account to share your taste
     </p>
-    <hr />
-  {% endfor %}
-</body>
 
+    <div style="text-align: center;">
+        <form action="{{ url_for('login') }}" method="get">
+            <button type="submit">Log In</button>
+        </form>
+
+        <form action="{{ url_for('register') }}" method="get">
+            <button type="submit">Register</button>
+        </form>
+    </div>
+
+    {% if session.username %}
+        <p style="text-align: center;">You're logged in as {{ session.username }}.</p>
+        <p style="text-align: center;">
+            <a href="{{ url_for('frontpage') }}">Go to music posts</a> |
+            <a href="{{ url_for('logout') }}">Log out</a>
+        </p>
+    {% endif %}
+</body>
 </html>
