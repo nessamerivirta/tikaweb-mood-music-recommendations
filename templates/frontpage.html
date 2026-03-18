@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>MoodMusic</title>
+</head>
+<body>
+    <p><a href="{{ url_for('logout') }}">Log out</a></p>
+    <h1 style="text-align: center;">Let's get sharing, {{ session.username }}!</h1>
+    {% if username %}
+    <h2>Post a song</h2>
+    <form action="/frontpage" method="post" enctype="multipart/form-data">
+        Artist: <input type="text" name="artist"><br>
+        <br>
+        Song: <input type="text" name="song"><br>
+        <br>
+        Comment: <textarea name="comment"></textarea><br>
+        <br>
+        Cover: <input type="file" name="image"><br>
+        <br>
+        <input type="submit" value="Lähetä">
+    </form>
+    {% endif %}
+
+    <h2>What are people listening to?</h2>
+    {% for post in posts %}
+        <p>
+            <strong>{{ post.username }}</strong> – {{ post.artist }} / {{ post.song }}<br>
+            {{ post.comment }}<br>
+            {% if post.image_path %}
+                <img src="{{ post.image_path }}" width="200"><br>
+            {% endif %}
+            <em>{{ post.sent_at }}</em>
+        </p>
+        <hr>
+    {% endfor %}
+</body>
+</html>
