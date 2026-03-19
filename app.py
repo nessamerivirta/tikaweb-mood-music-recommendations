@@ -38,7 +38,7 @@ def create_postdb():
                 image_path TEXT,
                 sent_at TEXT,
                 user_id INTEGER REFERENCES users,
-                picture BLOB
+                category TEXT
         )
     ''')
     connect.commit()
@@ -48,12 +48,26 @@ create_userdb()
 create_postdb()
 
 def get_posts():
-    sql = """SELECT p.id, p.artist, p.song, p.comment, p.image_path, p.sent_at, p.user_id, u.username
+    sql = """SELECT p.id, p.artist, p.song, p.comment, p.image_path, p.sent_at, p.user_id, p.category, u.username
              FROM posts p
              JOIN users u
              ON p.user_id = u.id
              ORDER BY p.sent_at DESC"""
     return db.query(sql)
+
+def get_post(post_id):
+    sql = """
+        SELECT id, artist, song, comment, image_path, sent_at, user_id
+        FROM posts
+        WHERE id = ?
+    """
+    rows = db.query(sql, [post_id])
+    return rows[0] if rows else None
+
+def remove_post(post_id):
+    sql = "DELETE FROM posts WHERE id = ?"
+    db.execute(sql, [post_id])
+
 
 @app.route("/", methods=["GET", "POST"])
 def index():
