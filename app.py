@@ -48,7 +48,7 @@ create_userdb()
 create_postdb()
 
 def get_posts():
-    sql = """SELECT p.id, p.artist, p.song, p.comment, p.image_path, p.sent_at, u.username
+    sql = """SELECT p.id, p.artist, p.song, p.comment, p.image_path, p.sent_at, p.user_id, u.username
              FROM posts p
              JOIN users u
              ON p.user_id = u.id
@@ -136,5 +136,57 @@ def create():
 def logout():
     del session["username"]
     return redirect("/")
+
+@app.route("/edit/<int:post_id>", methods=["GET", "POST"])
+def edit_post(post_id):
+    if "user_id" not in session:
+        return redirect("/login")
+
+    post = get_posts(post_id)
+    if not post:
+        return redirect("/frontpage")
+    if post["user_id"] != session["user_id"]:
+        return redirect("/frontpage")
+
+    if request.method == "GET":
+        return render_template("edit.html", post=post)
+
+    artist = request.form["artist"]
+    song = request.form["song"]
+    comment = request.form["comment"]
+ 
+    image_file = request.files.get("image")
+    if image_file and image_file.filename:
+        from werkzeug.utils import secure_filename
+        import uuid, os
+        filename = f"{uuid.uuid4().hex}_{secure_filename(image_file.filename)}"
+        os.makedirs('static/uploads', exist_ok=True)
+        image_path = os.path.join('static/uploads', filename)
+        image_file.save(image_path)
+        update_post(post_id, artist, song, comment, image_path=image_path)
+    else:
+        update_post(post_id, artist, song, comment)
+
+    return redirect("/frontpage")
+
+@app.route("/remove/<int:post_id>", methods=["GET", "POST"])
+def remove_post_route(post_id):
+    if "user_id" not in session:
+        return redirect("/login")
+
+    post = get_post(post_id)
+    if not post:
+        return redirect("/frontpage")
+    if post["user_id"] != session["user_id"]:
+        return redirect("/frontpage")
+
+    if request.method == "GET":
+        return render_template("remove.html", post=post)
+
+    if "continue" in request.form:
+        remove_post(post_id)
+    return redirect("/frontpage")
+
+
 
 app.run(debug=True)
