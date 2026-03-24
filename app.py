@@ -82,8 +82,8 @@ def update_post(post_id, artist, song, comment, image_path=None, category=None):
         sql = "UPDATE posts SET artist = ?, song = ?, comment = ? WHERE id = ?"
         db.execute(sql, [artist, song, comment, post_id])
 
-def search_songs(query):
-    sql = """
+def search_songs(query, category):
+    base_sql = """
         SELECT p.id AS post_id,
                p.artist,
                p.song,
@@ -95,11 +95,24 @@ def search_songs(query):
                u.id AS user_id
         FROM posts p
         JOIN users u ON u.id = p.user_id
-        WHERE (p.artist LIKE ? OR p.song LIKE ? OR p.comment LIKE ? OR p.category LIKE ?)
-        ORDER BY p.sent_at DESC
+        WHERE 1=1
     """
-    like = f"%{query}%"
-    return db.query(sql, [like, like, like, like])
+    params = []
+    if query:
+        like = f"%{query}%"
+        base_sql += " AND (p.artist LIKE ? OR p.song LIKE ? OR p.comment LIKE ? OR p.category LIKE ?)"
+        params += [like, like, like, like]
+
+    if category:
+        base_sql += " AND p.category = ?"
+        params.append(category)
+
+    base_sql += " ORDER BY p.sent_at DESC"
+    return db.query(base_sql, params)
+
+def get_categories():
+    rows = db.query("SELECT DISTINCT category FROM posts WHERE category IS NOT NULL AND category <> '' ORDER BY category")
+    return [r["category"] for r in rows]
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -238,7 +251,9 @@ def remove_post_route(post_id):
 @app.route("/search")
 def search():
     query = request.args.get("query")
-    results = search_songs(query) if query else []
-    return render_template("search.html", query=query, results=results)
+    category = request.args.get("category")
+    results = search_songs(query, category) if (query, category) else []
+    categories = get_categories()
+    return render_template("search.html", categories=categories, category=category, query=query, results=results)
 
 app.run(debug=True)
