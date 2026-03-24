@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Search</title>
+</head>
+<body>
+    <form action="/search" method="get">
+        <p>
+        Search for:
+        {% if query %}
+        <input type="text" name="query" value="{{ query }}" />
+        {% else %}
+        <input type="text" name="query" />
+        {% endif %}
+        </p>
+        <input type="submit" value="Search" />
+    </form>
+
+    {% if query %}
+    <hr />
+    <h2>Results</h2>
+  
+    <ul>
+    {% for result in results %}
+        <li>
+        <a href="/thread/{{ result.thread_id }}">
+            {{ result.thread_title }}
+        </a>
+        <br />
+        <strong>{{ result.username }}</strong> – {{ result.artist }} / {{ result.song }} - {{result.category}} <br>
+        {{ result.comment}}<br>
+        {% if result.image_path %}
+            <img src="{{ result.image_path }}" width="200"><br>
+        {% endif %}
+        <em>{{ result.sent_at }}</em>
+        </li>  
+    {% endfor %}
+    </ul>
+    {% endif %}
+
+    <p><a href="/frontpage">Back to the frontpage</a></p>
+</body>
+</html>
