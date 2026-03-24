@@ -14,24 +14,48 @@
         <br>
         Song: <input type="text" name="song"><br>
         <br>
+        Category:
+        <select name="category" required>
+            <option value=""disabled selected>Choose a mood</option>
+            <option value="Upbeat">Upbeat</option>
+            <option value="Sad">Sad</option>
+            <option value="Relaxing">Relaxing</option>
+            <option value="Aggressive">Aggressive</option>
+            <option value="Dreamy">Dreamy</option>
+            <option value="Cosy">Cosy</option>
+            <option value="Romantic">Romantic</option>
+            <option value="Focused">Focused</option>
+             <option value="Sleepy">Sleepy</option>
+        </select><br>
+        <br>
         Comment: <textarea name="comment"></textarea><br>
         <br>
         Cover: <input type="file" name="image"><br>
         <br>
-        <input type="submit" value="Lähetä">
+        <input type="submit" value="Send">
     </form>
     {% endif %}
 
     <h2>What are people listening to?</h2>
     {% for post in posts %}
         <p>
-            <strong>{{ post.username }}</strong> – {{ post.artist }} / {{ post.song }}<br>
+            <strong>{{ post.username }}</strong> – {{ post.artist }} / {{ post.song }} - {{post.category}} <br>
             {{ post.comment }}<br>
             {% if post.image_path %}
                 <img src="{{ post.image_path }}" width="200"><br>
             {% endif %}
             <em>{{ post.sent_at }}</em>
         </p>
+        {% if session.user_id and post.user_id == session.user_id %}
+        <div style="display:flex; gap:8px;">
+        <form action="/edit/{{ post.id }}" method="get">
+        <button type="submit">Edit</button>
+        </form>
+        <form action="/remove/{{ post.id }}" method="post" onsubmit="return confirm('Are you sure you want to remove?')">
+        <button type="submit" name="continue" value="1" style="background:#c0392b; color:#fff;">Delete</button>
+     </form>
+  </div>
+{% endif %}
         <hr>
     {% endfor %}
 </body>

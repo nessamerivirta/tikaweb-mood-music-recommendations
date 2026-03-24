@@ -5,38 +5,50 @@
     <title>Search</title>
 </head>
 <body>
-    <form action="/search" method="get">
-        <p>
-        Search for:
-        {% if query %}
-        <input type="text" name="query" value="{{ query }}" />
-        {% else %}
-        <input type="text" name="query" />
-        {% endif %}
-        </p>
-        <input type="submit" value="Search" />
+    <form action="/search" method="get" style="margin-bottom: 1rem;">
+        <input type="text" name="query" placeholder="Search for artists, songs or comments" value="{{ query or '' }}">
+        <select name="category">
+            <option value="">All categories</option>
+            <option value="Upbeat">Upbeat</option>
+            <option value="Sad">Sad</option>
+            <option value="Relaxing">Relaxing</option>
+            <option value="Aggressive">Aggressive</option>
+            <option value="Dreamy">Dreamy</option>
+            <option value="Cosy">Cosy</option>
+            <option value="Romantic">Romantic</option>
+            <option value="Focused">Focused</option>
+             <option value="Sleepy">Sleepy</option>
+            {% for cat in categories %}
+            <option value="{{ cat }}" {% if category == cat %}selected{% endif %}>{{ cat }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Search</button>
     </form>
 
     {% if query %}
     <hr />
     <h2>Results</h2>
-  
-    <ul>
-    {% for result in results %}
-        <li>
-        <a href="/thread/{{ result.thread_id }}">
-            {{ result.thread_title }}
-        </a>
-        <br />
-        <strong>{{ result.username }}</strong> – {{ result.artist }} / {{ result.song }} - {{result.category}} <br>
-        {{ result.comment}}<br>
-        {% if result.image_path %}
-            <img src="{{ result.image_path }}" width="200"><br>
+
+        {% if results %}
+        ul>
+        {% for result in results %}
+            <li>
+            <a href="/thread/{{ result.thread_id }}">
+                {{ result.thread_title }}
+            </a>
+            <br />
+            <strong>{{ result.username }}</strong> – {{ result.artist }} / {{ result.song }} - {{result.category}} <br>
+            {{ result.comment}}<br>
+            {% if result.image_path %}
+                <img src="{{ result.image_path }}" width="200"><br>
+            {% endif %}
+            <em>{{ result.sent_at }}</em>
+            </li>  
+        {% endfor %}
+        </ul>
+        {% else %}
+            <p><b>No results with these requirements</b></p>
         {% endif %}
-        <em>{{ result.sent_at }}</em>
-        </li>  
-    {% endfor %}
-    </ul>
     {% endif %}
 
     <p><a href="/frontpage">Back to the frontpage</a></p>
