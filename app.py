@@ -57,7 +57,7 @@ def get_posts():
 
 def get_post(post_id):
     sql = """
-        SELECT id, artist, song, comment, image_path, sent_at, user_id
+        SELECT id, artist, song, comment, image_path, sent_at, user_id, category
         FROM posts
         WHERE id = ?
     """
@@ -67,6 +67,39 @@ def get_post(post_id):
 def remove_post(post_id):
     sql = "DELETE FROM posts WHERE id = ?"
     db.execute(sql, [post_id])
+
+def update_post(post_id, artist, song, comment, image_path=None, category=None):
+    if image_path is not None and category is not None:
+        sql = "UPDATE posts SET artist = ?, song = ?, comment = ?, image_path = ?, category = ? WHERE id = ?"
+        db.execute(sql, [artist, song, comment, image_path, category, post_id])
+    elif image_path is not None:
+        sql = "UPDATE posts SET artist = ?, song = ?, comment = ?, image_path = ? WHERE id = ?"
+        db.execute(sql, [artist, song, comment, image_path, post_id])
+    elif category is not None:
+        sql = "UPDATE posts SET artist = ?, song = ?, comment = ?, category = ? WHERE id = ?"
+        db.execute(sql, [artist, song, comment, category, post_id])
+    else:
+        sql = "UPDATE posts SET artist = ?, song = ?, comment = ? WHERE id = ?"
+        db.execute(sql, [artist, song, comment, post_id])
+
+def search_songs(query):
+    sql = """
+        SELECT p.id AS post_id,
+               p.artist,
+               p.song,
+               p.comment,
+               p.image_path,
+               p.sent_at,
+               p.category,
+               u.username,
+               u.id AS user_id
+        FROM posts p
+        JOIN users u ON u.id = p.user_id
+        WHERE (p.artist LIKE ? OR p.song LIKE ? OR p.comment LIKE ? OR p.category LIKE ?)
+        ORDER BY p.sent_at DESC
+    """
+    like = f"%{query}%"
+    return db.query(sql, [like, like, like, like])
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -110,6 +143,7 @@ def frontpage():
     if request.method == "POST":
         artist = request.form["artist"]
         song = request.form["song"]
+        category = request.form["category"]
         comment = request.form["comment"]
         user_id = session["user_id"]
 
@@ -121,9 +155,9 @@ def frontpage():
             image_path = os.path.join('static/uploads', filename)
             image_file.save(image_path)
 
-        sql = """INSERT INTO posts (artist, song, comment, image_path, sent_at, user_id)
-                 VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, ?)"""
-        db.execute(sql, [artist, song, comment, image_path, user_id])
+        sql = """INSERT INTO posts (artist, song, comment, image_path, sent_at, user_id, category)
+                 VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?)"""
+        db.execute(sql, [artist, song, comment, image_path, user_id, category])
         return redirect("/frontpage")
 
     posts = get_posts()
@@ -156,7 +190,7 @@ def edit_post(post_id):
     if "user_id" not in session:
         return redirect("/login")
 
-    post = get_posts(post_id)
+    post = get_post(post_id)
     if not post:
         return redirect("/frontpage")
     if post["user_id"] != session["user_id"]:
@@ -201,6 +235,10 @@ def remove_post_route(post_id):
         remove_post(post_id)
     return redirect("/frontpage")
 
-
+@app.route("/search")
+def search():
+    query = request.args.get("query")
+    results = search_songs(query) if query else []
+    return render_template("search.html", query=query, results=results)
 
 app.run(debug=True)
