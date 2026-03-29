@@ -1,33 +1,39 @@
 <!DOCTYPE html>
 <html>
-<head><meta charset="UTF-8"><title>Edit</title></head>
+<head>
+  <meta charset="UTF-8">
+  <title>Edit</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
 <body>
-  <h1>Edit your post</h1>
-  <form action="/edit/{{ post.id }}" method="post" enctype="multipart/form-data">
-    <p>
-      Artist:<br>
-      <input type="text" name="artist" value="{{ post.artist }}" required>
-    </p>
-    <p>
-      Song:<br>
-      <input type="text" name="song" value="{{ post.song }}" required>
-    </p>
-    <p>
-      Comment:<br>
-      <textarea name="comment" rows="5" cols="40">{{ post.comment }}</textarea>
-    </p>
-    {% if post.image_path %}
+  <div class="container">
+    <h1>Edit your post</h1>
+    <form action="/edit/{{ post.id }}" method="post" enctype="multipart/form-data">
       <p>
-        Current cover:<br>
-        <img src="/{{ post.image_path }}" width="150">
+        Artist:<br>
+        <input type="text" name="artist" value="{{ post.artist }}" required>
       </p>
-    {% endif %}
-    <p>
-      Change cover:<br>
-      <input type="file" name="image">
-    </p>
-    <input type="submit" value="Send" />
-  </form>
-  <p><a href="{{ url_for('frontpage') }}">Cancel</a></p>
+      <p>
+        Song:<br>
+        <input type="text" name="song" value="{{ post.song }}" required>
+      </p>
+      <p>
+        Comment:<br>
+        <textarea name="comment" rows="5" cols="40">{{ post.comment }}</textarea>
+      </p>
+      {% if post.image_path %}
+        <p>
+          Current cover:<br>
+          <img src="/{{ post.image_path }}" width="150">
+        </p>
+      {% endif %}
+      <p>
+        Change cover:<br>
+        <input type="file" name="image">
+      </p>
+      <input type="submit" value="Send" />
+    </form>
+    <p><a href="{{ url_for('frontpage') }}">Cancel</a></p>
+  </div>
 </body>
 </html>

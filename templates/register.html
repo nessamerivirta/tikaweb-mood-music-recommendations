@@ -2,25 +2,30 @@
 <html>
 
 <head>
+  <meta charset="UTF-8">
   <title>Register</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
 </head>
 
 <body>
-  <form action="/create" method="post">
-    <p>
-      Username: <br />
-      <input type="text" name="username" />
-    </p>
-    <p>
-      Password: <br />
-      <input type="password" name="password1" />
-    </p>
-    <p>
-      Password again: <br />
-      <input type="password" name="password2" />
-    </p>
-    <input type="submit" value="Create account" />
-  </form>
+  <div class="container">
+    <h1>Create an account</h1>
+    <form action="/create" method="post">
+      <p>
+        Username: <br />
+        <input type="text" name="username" />
+      </p>
+      <p>
+        Password: <br />
+        <input type="password" name="password1" />
+      </p>
+      <p>
+        Password again: <br />
+        <input type="password" name="password2" />
+      </p>
+      <input type="submit" value="Create account" />
+    </form>
+  </div>
 </body>
 
 </html>
