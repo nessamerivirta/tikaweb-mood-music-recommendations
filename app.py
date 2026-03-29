@@ -252,8 +252,9 @@ def remove_post_route(post_id):
 def search():
     query = request.args.get("query")
     category = request.args.get("category")
-    results = search_songs(query, category) if (query, category) else []
+    results = search_songs(query, category) if (query or category) else []
     categories = get_categories()
     return render_template("search.html", categories=categories, category=category, query=query, results=results)
 
-app.run(debug=True)
+if __name__ == "__main__":
+    app.run(debug=True)
