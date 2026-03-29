@@ -1,0 +1,64 @@
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
+  background: linear-gradient(135deg, #dae1ff, #daeefc);
+}
+
+.container {
+  max-width: 50em;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+}
+
+.header {
+  font-size: 24px;
+  background-color: #daeefc;
+  padding: 0.4em;
+  margin: 0.4em 0;
+  text-align: center;
+}
+
+.prompt {
+  padding: 0.4em;
+  margin: 0.4em 0;
+  text-align: center;
+}
+
+.nav {
+  padding: 0.8em;
+  margin: 0.8em 0;
+}
+
+.frontpage_titles {
+  padding: 0.2em;
+  margin: 0.1em 0;
+  text-align: center;
+}
+
+.post_area {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.post_form {
+  flex: 1 1 60%;
+  text-align: left;
+}
+
+.post-side {
+  flex: 0 0 280px;
+}
+
+.post-side img {
+  max-width: 60%;
+  height: auto;
+  display: block;
+  margin-top: 1.2rem; 
+}
