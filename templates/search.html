@@ -32,7 +32,6 @@
         <h2>Results</h2>
 
             {% if results %}
-            ul>
             {% for result in results %}
                 <li>
                 <a href="/thread/{{ result.thread_id }}">
@@ -45,7 +44,8 @@
                     <img src="{{ result.image_path }}" width="200"><br>
                 {% endif %}
                 <em>{{ result.sent_at }}</em>
-                </li>  
+                </li>
+                <br>
             {% endfor %}
             </ul>
             {% else %}
