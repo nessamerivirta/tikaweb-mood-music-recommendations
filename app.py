@@ -7,6 +7,8 @@ from werkzeug.utils import secure_filename
 import os
 import db
 import config
+import users
+from flask import abort
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
@@ -150,6 +152,7 @@ def login():
 
 @app.route("/frontpage", methods=["GET", "POST"])
 def frontpage():
+    print("SESSION DEBUG:", dict(session), flush=True)
     if "user_id" not in session:
         return redirect("/login")
 
@@ -195,7 +198,7 @@ def create():
 
 @app.route("/logout")
 def logout():
-    del session["username"]
+    session.clear()
     return redirect("/")
 
 @app.route("/edit/<int:post_id>", methods=["GET", "POST"])
@@ -255,6 +258,14 @@ def search():
     results = search_songs(query, category) if (query or category) else []
     categories = get_categories()
     return render_template("search.html", categories=categories, category=category, query=query, results=results)
+
+@app.route("/user/<int:user_id>")
+def show_user(user_id):
+    user = users.get_user(user_id)
+    if not user:
+        abort(404)
+    posts = users.get_posts(user_id)
+    return render_template("user.html", user=user, posts=posts)
 
 if __name__ == "__main__":
     app.run(debug=True)
