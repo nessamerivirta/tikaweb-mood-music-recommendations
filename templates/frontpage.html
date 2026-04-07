@@ -104,6 +104,19 @@
                 </form>
             </div>
             {% endif %}
+            <div style="display:flex; align-items:center; gap:8px;">
+                <form action="{{ url_for('like_post', post_id=post.id) }}" method="post" style="display:inline;">
+                    <button type="submit">
+                        {% if session.user_id and post.user_id == session.user_id %}
+                            ❤️ {{ post.like_count if post.like_count is defined else 0 }}  <!-- voi haluta estää oman postin liketyksen, valinnainen -->
+                        {% else %}
+                        {% set liked = post.liked_by_me if post.liked_by_me is defined else false %}
+                        {{ '❤️' if liked else '🤍' }}
+                        {{ post.like_count if post.like_count is defined else 0 }}
+                        {% endif %}
+                    </button>
+                </form>
+            </div>
             <hr>
         {% endfor %}
     </div>
