@@ -1,3 +1,4 @@
+import sqlite3
 import db
 
 def get_user(user_id):
