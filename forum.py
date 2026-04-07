@@ -50,9 +50,28 @@ def create_likesdb():
     connect.commit()
     connect.close()
 
+def create_ratingsdb():
+    conn = sqlite3.connect("database.db")
+    cur = conn.cursor()
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS ratings (
+            user_id INTEGER NOT NULL,
+            post_id INTEGER NOT NULL,
+            rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 10),
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (user_id, post_id),
+            FOREIGN KEY (user_id) REFERENCES users (id),
+            FOREIGN KEY (post_id) REFERENCES posts (id)
+        )
+    """)
+    conn.commit()
+    conn.close()
+
 create_userdb()
 create_postdb()
 create_likesdb()
+create_ratingsdb()
 
 def get_posts():
     sql = """SELECT p.id, p.artist, p.song, p.comment, p.image_path, p.sent_at, p.user_id, p.category, u.username
