@@ -8,6 +8,7 @@ import os
 import db
 import config
 import users
+import likes
 from flask import abort
 
 app = Flask(__name__)
@@ -46,8 +47,25 @@ def create_postdb():
     connect.commit()
     connect.close()
 
+def create_likesdb():
+    connect = sqlite3.connect("database.db")
+    cursor = connect.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS likes (
+            user_id INTEGER NOT NULL,
+            post_id INTEGER NOT NULL,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (user_id, post_id),
+            FOREIGN KEY (user_id) REFERENCES users (id),
+            FOREIGN KEY (post_id) REFERENCES posts (id)
+        )
+    """)
+    connect.commit()
+    connect.close()
+
 create_userdb()
 create_postdb()
+create_likesdb()
 
 def get_posts():
     sql = """SELECT p.id, p.artist, p.song, p.comment, p.image_path, p.sent_at, p.user_id, p.category, u.username
@@ -177,6 +195,11 @@ def frontpage():
         return redirect("/frontpage")
 
     posts = get_posts()
+    uid = session.get("user_id")
+    for p in posts:
+        p["like_count"] = likes.like_count(p["id"])
+        p["liked_by_me"] = likes.has_liked(uid, p["id"]) if uid else False
+
     return render_template("frontpage.html", posts=posts, username=session.get("username"))
 
 @app.route("/create", methods=["POST"])
@@ -265,7 +288,26 @@ def show_user(user_id):
     if not user:
         abort(404)
     posts = users.get_posts(user_id)
+    uid = session.get("user_id")
+    for p in posts:
+        p["like_count"] = likes.like_count(p["id"])
+        p["liked_by_me"] = likes.has_liked(uid, p["id"]) if uid else False
     return render_template("user.html", user=user, posts=posts)
+
+@app.route("/like/<int:post_id>", methods=["POST"])
+def like_post(post_id):
+    if "user_id" not in session:
+        return redirect("/login")
+    user_id = session["user_id"]
+
+    post = get_post(post_id)
+    if not post:
+        return redirect(url_for("frontpage"))
+
+    likes.toggle_like(user_id, post_id)
+
+    ref = request.headers.get("Referer") or url_for("frontpage")
+    return redirect(ref)
 
 if __name__ == "__main__":
     app.run(debug=True)
