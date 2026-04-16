@@ -28,7 +28,8 @@ def create_postdb():
                 image_path TEXT,
                 sent_at TEXT,
                 user_id INTEGER REFERENCES users,
-                category TEXT
+                genre TEXT,
+                mood TEXT
         )
     ''')
     connect.commit()
@@ -74,7 +75,7 @@ create_likesdb()
 create_ratingsdb()
 
 def get_posts():
-    sql = """SELECT p.id, p.artist, p.song, p.comment, p.image_path, p.sent_at, p.user_id, p.category, u.username
+    sql = """SELECT p.id, p.artist, p.song, p.comment, p.image_path, p.sent_at, p.user_id, p.genre, p.mood, u.username
              FROM posts p
              JOIN users u
              ON p.user_id = u.id
@@ -83,7 +84,7 @@ def get_posts():
 
 def get_post(post_id):
     sql = """
-        SELECT id, artist, song, comment, image_path, sent_at, user_id, category
+        SELECT id, artist, song, comment, image_path, sent_at, user_id, genre, mood
         FROM posts
         WHERE id = ?
     """
@@ -94,29 +95,33 @@ def remove_post(post_id):
     sql = "DELETE FROM posts WHERE id = ?"
     db.execute(sql, [post_id])
 
-def update_post(post_id, artist, song, comment, image_path=None, category=None):
-    if image_path is not None and category is not None:
-        sql = "UPDATE posts SET artist = ?, song = ?, comment = ?, image_path = ?, category = ? WHERE id = ?"
-        db.execute(sql, [artist, song, comment, image_path, category, post_id])
+def update_post(post_id, artist, song, comment, image_path=None, genre=None, mood=None):
+    if image_path is not None and genre is not None and mood is not None:
+        sql = "UPDATE posts SET artist = ?, song = ?, comment = ?, image_path = ?, genre = ?, mood = ? WHERE id = ?"
+        db.execute(sql, [artist, song, comment, image_path, genre, mood, post_id])
     elif image_path is not None:
         sql = "UPDATE posts SET artist = ?, song = ?, comment = ?, image_path = ? WHERE id = ?"
         db.execute(sql, [artist, song, comment, image_path, post_id])
-    elif category is not None:
-        sql = "UPDATE posts SET artist = ?, song = ?, comment = ?, category = ? WHERE id = ?"
-        db.execute(sql, [artist, song, comment, category, post_id])
+    elif genre is not None:
+        sql = "UPDATE posts SET artist = ?, song = ?, comment = ?, genre = ? WHERE id = ?"
+        db.execute(sql, [artist, song, comment, genre, post_id])
+    elif mood is not None:
+        sql = "UPDATE posts SET artist = ?, song = ?, comment = ?, mood = ? WHERE id = ?"
+        db.execute(sql, [artist, song, comment, mood, post_id])
     else:
         sql = "UPDATE posts SET artist = ?, song = ?, comment = ? WHERE id = ?"
         db.execute(sql, [artist, song, comment, post_id])
 
-def search_songs(query, category):
+def search_songs(query=None, genre=None, mood=None):
     base_sql = """
-        SELECT p.id AS post_id,
+        SELECT p.id AS id,
                p.artist,
                p.song,
                p.comment,
                p.image_path,
                p.sent_at,
-               p.category,
+               p.genre,
+               p.mood,
                u.username,
                u.id AS user_id
         FROM posts p
@@ -124,18 +129,31 @@ def search_songs(query, category):
         WHERE 1=1
     """
     params = []
+
+    query = query.strip() if query else None
+    genre = genre.strip() if genre else None
+    mood = mood.strip() if mood else None
+
     if query:
         like = f"%{query}%"
-        base_sql += " AND (p.artist LIKE ? OR p.song LIKE ? OR p.comment LIKE ? OR p.category LIKE ?)"
-        params += [like, like, like, like]
+        base_sql += " AND (p.artist LIKE ? OR p.song LIKE ? OR p.comment LIKE ? OR p.genre LIKE ? OR p.mood LIKE ?)"
+        params += [like, like, like, like, like]
 
-    if category:
-        base_sql += " AND p.category = ?"
-        params.append(category)
+    if genre:
+        base_sql += " AND p.genre = ?"
+        params.append(genre)
+
+    if mood:
+        base_sql += " AND p.mood = ?"
+        params.append(mood)
 
     base_sql += " ORDER BY p.sent_at DESC"
     return db.query(base_sql, params)
 
-def get_categories():
-    rows = db.query("SELECT DISTINCT category FROM posts WHERE category IS NOT NULL AND category <> '' ORDER BY category")
-    return [r["category"] for r in rows]
+def get_genre():
+    rows = db.query("SELECT DISTINCT genre FROM posts WHERE genre IS NOT NULL AND genre <> '' ORDER BY genre")
+    return [r["genre"] for r in rows]
+
+def get_mood():
+    rows = db.query("SELECT DISTINCT mood FROM posts WHERE mood IS NOT NULL AND mood <> '' ORDER BY mood")
+    return [r["mood"] for r in rows]
