@@ -7,36 +7,52 @@
 </head>
 <body>
     <div class="container">
+        <div class="topbar">
+            {% if session.user_id %}
+            <a href="{{ url_for('logout') }}">Log out</a>
+            <a href="{{ url_for('frontpage') }}">Let's scroll some more</a>
+            {% endif %}
+        </div>
         <h2>My account</h2>
         <h1>{{ user.username }}</h1>
 
         <p>
-        User has uploaded {{ posts | count }} posts
+        This user has gracefully shared their music {{ posts | count }} times
         </p>
 
         {% if posts %}
         <p>
-        First post uploaded {{ posts[-1].sent_at }}
+        First post was uploaded on {{ posts[-1].sent_at }}
         </p>
         <p>
-        Latest post uploaded {{ posts[0].sent_at }}
+        Latest post was uploaded on {{ posts[0].sent_at }}
         </p>
         {% endif %}
 
-        <ul>
+        <p>All posts:</p>
         {% for post in posts %}
-        <li style="margin-bottom:1rem;">
-            <strong>{{ post.artist }} – {{ post.song }}</strong>
-            <div>Category: {{ post.category }}</div>
-            {% if post.comment %}
-                <div>{{ post.comment }}</div>
+        <hr>
+            <p>
+                <strong>{{ post.username }}</strong> – {{ post.artist }} / {{ post.song }} - {{post.genre}} - {{post.mood}} <br>
+                <br>
+                {{ post.comment }}<br>
+                <br>
+                {% if post.image_path %}
+                    <img src="/{{ post.image_path }}" alt="Cover" width="200"><br>
+                    <br>
+                {% endif %}
+                <em>{{ post.sent_at }}</em>
+            </p>
+            {% if session.user_id and post.user_id == session.user_id %}
+            <div style="display:flex; gap:8px;">
+                <form action="/edit/{{ post.id }}" method="get">
+                    <button type="submit">Edit</button>
+                </form>
+                <form action="/remove/{{ post.id }}" method="post" onsubmit="return confirm('Are you sure you want to remove?')">
+                    <button type="submit" name="continue" value="1" style="background:#c0392b; color:#fff;">Delete</button>
+                </form>
+            </div>
             {% endif %}
-            {% if post.image_path %}
-                <div><img src="/{{ post.image_path }}" alt="Cover" style="max-width:200px;"></div>
-            {% endif %}
-            <em>{{ post.sent_at }}</em>
-        </li>
         {% endfor %}
-        </ul>
     </div>
 </body>
