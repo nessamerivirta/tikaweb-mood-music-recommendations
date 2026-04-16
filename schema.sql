@@ -12,7 +12,8 @@ CREATE TABLE posts (
     image_path TEXT,
     sent_at TEXT,
     user_id INTEGER REFERENCES users,
-    category TEXT
+    genre TEXT
+    mood TEXT
 );
 
 CREATE TABLE likes (
