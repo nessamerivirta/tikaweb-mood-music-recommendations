@@ -11,10 +11,21 @@ import forum
 import users
 import likes
 import ratings
+import secrets
 from flask import abort
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
+
+@app.before_request
+def make_csrf_token():
+    if "csrf_token" not in session:
+        session["csrf_token"] = secrets.token_hex(16)
+
+
+def check_csrf():
+    if request.form.get("csrf_token") != session.get("csrf_token"):
+        abort(403)
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -28,6 +39,7 @@ def register():
 def login():
     error = None
     if request.method == "POST":
+        check_csrf()
         username = request.form["username"]
         password = request.form["password"]
 
@@ -56,6 +68,7 @@ def frontpage():
         return redirect("/login")
 
     if request.method == "POST":
+        check_csrf()
         artist = request.form["artist"]
         song = request.form["song"]
         genre = request.form["genre"]
@@ -98,6 +111,7 @@ def frontpage():
 
 @app.route("/create", methods=["POST"])
 def create():
+    check_csrf()
     username = request.form["username"]
     password1 = request.form["password1"]
     password2 = request.form["password2"]
@@ -131,6 +145,8 @@ def edit_post(post_id):
 
     if request.method == "GET":
         return render_template("edit.html", post=post)
+    
+    check_csrf()
 
     artist = request.form["artist"]
     song = request.form["song"]
@@ -163,6 +179,8 @@ def remove_post_route(post_id):
 
     if request.method == "GET":
         return render_template("remove.html", post=post)
+    
+    check_csrf()
 
     if "continue" in request.form:
         forum.remove_post(post_id)
@@ -239,6 +257,7 @@ def show_user(user_id):
 def like_post(post_id):
     if "user_id" not in session:
         return redirect("/login")
+    check_csrf()
     user_id = session["user_id"]
 
     post = forum.get_post(post_id)
@@ -258,6 +277,7 @@ from flask import url_for
 def rate_post(post_id):
     if "user_id" not in session:
         return redirect(url_for("login"))
+    check_csrf()
     post = forum.get_post(post_id)
     if not post:
         return redirect(url_for("frontpage"))
