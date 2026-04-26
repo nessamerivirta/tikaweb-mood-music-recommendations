@@ -4,6 +4,7 @@
 <body>
   <h1>Remove post</h1>
   <form action="/remove/{{ post.id }}" method="post">
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
     <p>Are you sure you want to remove?</p>
     <input type="submit" name="continue" value="Continue" />
     <input type="submit" name="cancel" value="Cancel" />

@@ -61,6 +61,7 @@
                     <br>
                     Cover: <input type="file" name="image"><br>
                     <br>
+                    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
                     <input type="submit" value="Send">
                 </form>
             </div>
@@ -76,7 +77,7 @@
         <h2>What are people listening to?</h2>
 
         <form action="/search" method="get" style="margin-bottom: 1rem;">
-            <input type="text" name="query" placeholder="Search for artists, songs or comments" value="{{ query or '' }}">
+            <input type="text" name="query" placeholder="Search for your new favourite" value="{{ query or '' }}">
             <select name="genre">
                 <option value="">All genres</option>
                 <option value="Pop">Pop</option>
@@ -103,7 +104,7 @@
                 <option value="Romantic">Romantic</option>
                 <option value="Focused">Focused</option>
                 <option value="Sleepy">Sleepy</option>
-                {% for mo in mood %}
+                {% for mo in moods %}
                 <option value="{{ mo }}" {% if mood == mo %}selected{% endif %}>{{ mo }}</option>
                 {% endfor %}
             </select>
@@ -114,7 +115,7 @@
 
         {% for post in posts %}
                 <p>
-                    <strong>{{ post.username }}</strong> – {{ post.artist }} / {{ post.song }} - {{post.category}} <br>
+                    <strong>{{ post.username }}</strong> – {{ post.artist }} / {{ post.song }} - {{post.genre}} - {{post.mood}} <br>
                     <br>
                     {{ post.comment }}<br>
                     <br>
@@ -130,12 +131,14 @@
                         <button type="submit">Edit</button>
                     </form>
                     <form action="/remove/{{ post.id }}" method="post" onsubmit="return confirm('Are you sure you want to remove?')">
+                        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
                         <button type="submit" name="continue" value="1" style="background:#c0392b; color:#fff;">Delete</button>
                     </form>
                 </div>
                     {% endif %}
                     <div class="post-meta" style="display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-top:0.5rem;">
                         <form action="{{ url_for('rate_post', post_id=post.id) }}" method="post" style="display:flex; align-items:center; gap:0.5rem;">
+                            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
                             <label for="rating-{{ post.id }}">Rate:</label>
                             <select id="rating-{{ post.id }}" name="rating">
                                 {% for n in range(1, 11) %}
@@ -157,6 +160,7 @@
                 <br>
                 <div style="display:flex; align-items:center; gap:8px;">
                     <form action="{{ url_for('like_post', post_id=post.id) }}?from={{ request.path }}%23post-{{ post.id }}" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
                         <button type="submit" class="like-btn">
                             {% if session.user_id and post.user_id == session.user_id %}
                                 ❤️ {{ post.like_count if post.like_count is defined else 0 }}
