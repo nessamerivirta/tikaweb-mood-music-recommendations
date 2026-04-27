@@ -14,6 +14,7 @@
             {% endif %}
         </div>
         <h2>My account</h2>
+        <hr>
         <h1>{{ user.username }}</h1>
 
         <p>
@@ -29,7 +30,9 @@
         </p>
         {% endif %}
 
-        <p>All posts:</p>
+        <hr>
+        <h3>All posts:</h3>
+        {% if posts %}
         {% for post in posts %}
         <hr>
             <p>
@@ -56,6 +59,8 @@
             </div>
             {% endif %}
         {% endfor %}
+        {% endif %}
+        <p>No posts yet</p>
     </div>
 </body>
 </html>
