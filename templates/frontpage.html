@@ -24,12 +24,16 @@
             <div class="post_form">
                 <h2>Post a song</h2>
                 <form action="/frontpage" method="post" enctype="multipart/form-data">
-                    Artist: <input type="text" name="artist"><br>
+                    <label for="artist">Artist:</label>
+                    <input id="artist" type="text" name="artist">
                     <br>
-                    Song: <input type="text" name="song"><br>
                     <br>
-                    Genre:
-                    <select name="genre" required>
+                    <label for="song">Song:</label>
+                    <input id="song" type="text" name="song">
+                    <br>
+                    <br>
+                    <label for="genre">Genre:</label>
+                    <select id="genre" name="genre" required>
                         <option value=""disabled selected>Choose a genre</option>
                         <option value="Pop">Pop</option>
                         <option value="Rock">Rock</option>
@@ -43,8 +47,8 @@
                         <option value="Mixed">Mixed</option>
                     </select><br>
                     <br>
-                    Mood:
-                    <select name="mood" required>
+                    <label for="mood">Mood:</label>
+                    <select id="mood" name="mood" required>
                         <option value=""disabled selected>Choose a mood</option>
                         <option value="Upbeat">Upbeat</option>
                         <option value="Sad">Sad</option>
@@ -57,9 +61,13 @@
                         <option value="Sleepy">Sleepy</option>
                     </select><br>
                     <br>
-                    Comment: <textarea name="comment"></textarea><br>
+                    <label for="comment">Comment:</label>
+                    <textarea id="comment" name="comment"></textarea>
                     <br>
-                    Cover: <input type="file" name="image"><br>
+                    <br>
+                    <label for="image">Cover image:</label>
+                    <input id="image" type="file" name="image">
+                    <br>
                     <br>
                     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
                     <input type="submit" value="Send">
@@ -77,8 +85,10 @@
         <h2>What are people listening to?</h2>
 
         <form action="/search" method="get" style="margin-bottom: 1rem;">
-            <input type="text" name="query" placeholder="Search for your new favourite" value="{{ query or '' }}">
-            <select name="genre">
+            <label for="query">Search:</label>
+            <input id="query" type="text" name="query" placeholder="Search for your new favourite" value="{{ query or '' }}">
+            <label for="genre">Pick a genre:</label>
+            <select id="genre" name="genre">
                 <option value="">All genres</option>
                 <option value="Pop">Pop</option>
                 <option value="Rock">Rock</option>
@@ -93,7 +103,8 @@
                 <option value="{{ gen }}" {% if genre == gen %}selected{% endif %}>{{ gen }}</option>
                 {% endfor %}
             </select>
-            <select name="mood">
+            <label for="mood">Pick a mood:</label>
+            <select id="mood" name="mood">
                 <option value="">All moods</option>
                 <option value="Upbeat">Upbeat</option>
                 <option value="Sad">Sad</option>

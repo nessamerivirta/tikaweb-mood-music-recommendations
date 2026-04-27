@@ -18,12 +18,12 @@
             <form action="{{ url_for('login') }}" method="post">
                 <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
                 <p>
-                    Insert username:
-                    <input type="text" name="username" />
+                    <label for ="username">Insert username:</label>
+                    <input id="username" type="text" name="username" />
                 </p>
                 <p>
-                    Insert password:
-                    <input type="password" name="password" />
+                    <label for ="password">Insert password:</label>
+                    <input id="password" type="password" name="password" />
                 </p>
                 <input type="submit" value="Next" />
             </form>

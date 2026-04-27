@@ -16,8 +16,10 @@
         <h2>Search for your new favourite</h2>
 
         <form action="/search" method="get" style="margin-bottom: 1rem;">
-            <input type="text" name="query" placeholder="Change your search" value="{{ query or '' }}">
-            <select name="genre">
+            <label for="query">Search</label>
+            <input id="query" type="text" name="query" placeholder="Change your search" value="{{ query or '' }}">
+            <label for="genre">Genre</label>
+            <select id="genre" name="genre">
                 <option value="">All genres</option>
                 <option value="Pop">Pop</option>
                 <option value="Rock">Rock</option>
@@ -32,7 +34,8 @@
                 <option value="{{ gen }}" {% if genre == gen %}selected{% endif %}>{{ gen }}</option>
                 {% endfor %}
             </select>
-            <select name="mood">
+            <label for="mood">Mood</label>
+            <select id="mood" name="mood">
                 <option value="">All moods</option>
                 <option value="Upbeat">Upbeat</option>
                 <option value="Sad">Sad</option>

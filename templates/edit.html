@@ -17,26 +17,31 @@
     <hr>
     <form action="/edit/{{ post.id }}" method="post" enctype="multipart/form-data">
       <p>
-        Artist:<br>
-        <input type="text" name="artist" value="{{ post.artist }}" required>
+        <label for="artist">Artist:</label>
+        <br>
+        <input id="artist" type="text" name="artist" value="{{ post.artist }}" required>
       </p>
       <p>
-        Song:<br>
-        <input type="text" name="song" value="{{ post.song }}" required>
+        <label for="song">Song:</label>
+        <br>
+        <input id="song" type="text" name="song" value="{{ post.song }}" required>
       </p>
       <p>
-        Comment:<br>
-        <textarea name="comment" rows="5" cols="40">{{ post.comment }}</textarea>
+        <label for="comment">Comment:</label>
+        <br>
+        <textarea id="comment" name="comment" rows="5" cols="40">{{ post.comment }}</textarea>
       </p>
       {% if post.image_path %}
         <p>
-          Current cover:<br>
+          Current cover:
+          <br>
           <img src="/{{ post.image_path }}" width="150">
         </p>
       {% endif %}
       <p>
-        Change cover:<br>
-        <input type="file" name="image">
+        <label for="image">Change cover:</label>
+        <br>
+        <input id="image" type="file" name="image">
       </p>
       <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
       <input type="submit" value="Send" />
