@@ -123,9 +123,11 @@ def search_songs(query=None, genre=None, mood=None):
                p.genre,
                p.mood,
                u.username,
-               u.id AS user_id
+               u.id AS user_id,
+               COUNT(l.post_id) AS like_count
         FROM posts p
         JOIN users u ON u.id = p.user_id
+        LEFT JOIN likes l ON l.post_id = p.id
         WHERE 1=1
     """
     params = []
@@ -146,8 +148,12 @@ def search_songs(query=None, genre=None, mood=None):
     if mood:
         base_sql += " AND p.mood = ?"
         params.append(mood)
+    
+    base_sql += """
+        GROUP BY p.id, u.id
+        ORDER BY like_count DESC, p.sent_at DESC
+    """
 
-    base_sql += " ORDER BY p.sent_at DESC"
     return db.query(base_sql, params)
 
 def get_genre():
