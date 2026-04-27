@@ -46,9 +46,11 @@
             {% if session.user_id and post.user_id == session.user_id %}
             <div style="display:flex; gap:8px;">
                 <form action="/edit/{{ post.id }}" method="get">
+                    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
                     <button type="submit">Edit</button>
                 </form>
                 <form action="/remove/{{ post.id }}" method="post" onsubmit="return confirm('Are you sure you want to remove?')">
+                    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
                     <button type="submit" name="continue" value="1" style="background:#c0392b; color:#fff;">Delete</button>
                 </form>
             </div>
@@ -56,3 +58,4 @@
         {% endfor %}
     </div>
 </body>
+</html>
