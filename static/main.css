@@ -69,3 +69,18 @@ body {
   align-items: center;
   margin-bottom: 1rem;
 }
+
+.like-btn {
+  background: none;
+  color: inherit;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 16px;
+  line-height: 1;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
