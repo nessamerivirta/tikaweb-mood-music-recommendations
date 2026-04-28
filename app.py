@@ -263,7 +263,7 @@ def like_post(post_id):
     post = forum.get_post(post_id)
     if not post:
         return redirect(url_for("frontpage"))
-
+    
     likes.toggle_like(user_id, post_id)
 
     back = request.args.get("from")
