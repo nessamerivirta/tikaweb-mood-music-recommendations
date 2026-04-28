@@ -78,12 +78,14 @@
                             <button type="submit">Edit</button>
                         </form>
                         <form action="/remove/{{ result.id }}" method="post" onsubmit="return confirm('Are you sure you want to remove?')">
+                            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
                             <button type="submit" name="continue" value="1" style="background:#c0392b; color:#fff;">Delete</button>
                         </form>
                     </div>
                     {% endif %}
                         <div class="post-meta" style="display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-top:0.5rem;">
                             <form action="{{ url_for('rate_post', post_id=result.id) }}" method="post" style="display:flex; align-items:center; gap:0.5rem;">
+                                <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
                                 <label for="rating-{{ result.id }}">Rate:</label>
                                 <select id="rating-{{ result.id }}" name="rating">
                                     {% for n in range(1, 11) %}
@@ -105,7 +107,8 @@
                     <br>
                     <div style="display:flex; align-items:center; gap:8px;">
                         <form action="{{ url_for('like_post', post_id=result.id) }}?from={{ request.path }}%23post-{{ result.id }}" method="post">
-                            <button type="submit" class="like-btn">
+                            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                            <button type="submit" class="like-btn" {% if session.user_id and result.user_id == session.user_id %}disabled{% endif %}>
                                 {% if session.user_id and result.user_id == session.user_id %}
                                     ❤️ {{ result.like_count if result.like_count is defined else 0 }}
                                 {% else %}

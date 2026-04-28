@@ -60,7 +60,9 @@
             {% endif %}
         {% endfor %}
         {% endif %}
+        {% if not posts %}
         <p>No posts yet</p>
+        {% endif %}
     </div>
 </body>
 </html>
