@@ -12,7 +12,8 @@ import users
 import likes
 import ratings
 import secrets
-from flask import abort
+from flask import abort, url_for
+from services.posts import enrich_posts_with_likes_and_ratings
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
@@ -69,12 +70,34 @@ def frontpage():
 
     if request.method == "POST":
         check_csrf()
-        artist = request.form["artist"]
-        song = request.form["song"]
-        genre = request.form["genre"]
-        mood = request.form["mood"]
-        comment = request.form["comment"]
+        artist = request.form.get("artist", "").strip()
+        song = request.form.get("song", "").strip()
+        genre = request.form.get("genre", "").strip()
+        mood = request.form.get("mood", "").strip()
+        comment = request.form.get("comment", "").strip()
         user_id = session["user_id"]
+
+        errors = []
+        if not artist:
+            errors.append("Artist is required")
+        if not song:
+            errors.append("Song is required")
+        if not genre:
+            errors.append("Genre is required")
+        if not mood:
+            errors.append("Mood is required")
+
+        if errors:
+            posts = forum.get_posts()
+            uid = session.get("user_id")
+            posts = enrich_posts_with_likes_and_ratings(posts, uid)
+            return render_template(
+                "frontpage.html",
+                posts=posts,
+                username=session.get("username"),
+                error="; ".join(errors),
+                form={"artist": artist, "song": song, "genre": genre, "mood": mood, "comment": comment}
+            )
 
         image_file = request.files.get("image")
         image_path = None
@@ -91,22 +114,7 @@ def frontpage():
 
     posts = forum.get_posts()
     uid = session.get("user_id")
-    for p in posts:
-        p["like_count"] = likes.like_count(p["id"])
-        p["liked_by_me"] = likes.has_liked(uid, p["id"]) if uid else False
-
-    for p in posts:
-        p["like_count"] = likes.like_count(p["id"])
-        p["liked_by_me"] = likes.has_liked(uid, p["id"]) if uid else False
-
-    post_ids = [p["id"] for p in posts]
-    stats = ratings.get_rating_stats_for_posts(post_ids)
-
-    for p in posts:
-        s = stats.get(p["id"])
-        p["avg_rating"] = s["avg"] if s else None
-        p["rating_count"] = s["count"] if s else 0
-
+    posts = enrich_posts_with_likes_and_ratings(posts, uid)
     return render_template("frontpage.html", posts=posts, username=session.get("username"))
 
 @app.route("/create", methods=["POST"])
@@ -115,15 +123,17 @@ def create():
     username = request.form["username"]
     password1 = request.form["password1"]
     password2 = request.form["password2"]
+    if not username or not password1:
+        return render_template("register.html", error="Username and password are required", username=username)
     if password1 != password2:
-        return "ERROR: passwords do not match"
+        return render_template("register.html", error="Passwords do not match", username=username)
     password_hash = generate_password_hash(password1)
 
     try:
         sql = "INSERT INTO users (username, password_hash) VALUES (?, ?)"
         db.execute(sql, [username, password_hash])
     except sqlite3.IntegrityError:
-        return "ERROR: username taken"
+        return render_template("register.html", error="Username is taken", username=username)
 
     return redirect("/")
 
@@ -193,49 +203,9 @@ def search():
     mood = request.args.get("mood", "")
     results = forum.search_songs(query, genre, mood)
 
-    ids = [r["id"] for r in results]
     uid = session.get("user_id")
-
-    if ids:
-        placeholders = ",".join(["?"] * len(ids))
-        like_rows = db.query(
-            f"SELECT post_id, COUNT(*) AS cnt FROM likes WHERE post_id IN ({placeholders}) GROUP BY post_id",
-            ids
-        )
-        like_counts = {row["post_id"]: row["cnt"] for row in like_rows}
-
-        liked_set = set()
-        if uid:
-            liked_rows = db.query(
-                f"SELECT post_id FROM likes WHERE user_id = ? AND post_id IN ({placeholders})",
-                [uid] + ids
-            )
-            liked_set = {row["post_id"] for row in liked_rows}
-
-        rating_rows = db.query(
-            f"SELECT post_id, AVG(rating) AS avg_rating, COUNT(*) AS cnt FROM ratings WHERE post_id IN ({placeholders}) GROUP BY post_id",
-            ids
-        )
-        rating_stats = {
-            row["post_id"]: (float(row["avg_rating"]) if row["avg_rating"] is not None else None, row["cnt"])
-            for row in rating_rows
-        }
-        my_ratings = {}
-        if uid:
-            my_rows = db.query(
-                f"SELECT post_id, rating FROM ratings WHERE user_id = ? AND post_id IN ({placeholders})",
-                [uid] + ids
-            )
-            my_ratings = {row["post_id"]: row["rating"] for row in my_rows}
-
-        for r in results:
-            pid = r["id"]
-            r["like_count"] = like_counts.get(pid, 0)
-            r["liked_by_me"] = pid in liked_set
-            avg, cnt = rating_stats.get(pid, (None, 0))
-            r["avg_rating"] = avg
-            r["rating_count"] = cnt
-            r["my_rating"] = my_ratings.get(pid)
+    if results:
+        results = enrich_posts_with_likes_and_ratings(results, uid)
 
     genres = forum.get_genre()
     moods = forum.get_mood()
@@ -248,9 +218,7 @@ def show_user(user_id):
         abort(404)
     posts = users.get_posts(user_id)
     uid = session.get("user_id")
-    for p in posts:
-        p["like_count"] = likes.like_count(p["id"])
-        p["liked_by_me"] = likes.has_liked(uid, p["id"]) if uid else False
+    posts = enrich_posts_with_likes_and_ratings(posts, uid)
     return render_template("user.html", user=user, posts=posts)
 
 @app.route("/like/<int:post_id>", methods=["POST"])
@@ -263,15 +231,15 @@ def like_post(post_id):
     post = forum.get_post(post_id)
     if not post:
         return redirect(url_for("frontpage"))
-    
+    if post["user_id"] == user_id:
+        back = request.args.get("from")
+        return redirect(back or (url_for("frontpage") + f"#post-{post_id}"))
     likes.toggle_like(user_id, post_id)
 
     back = request.args.get("from")
     if back:
         return redirect(back)
     return redirect(url_for("frontpage") + f"#post-{post_id}")
-
-from flask import url_for
 
 @app.route("/rate/<int:post_id>", methods=["POST"])
 def rate_post(post_id):
