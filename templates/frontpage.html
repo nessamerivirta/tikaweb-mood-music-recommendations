@@ -148,6 +148,7 @@
                 </div>
                     {% endif %}
                     <div class="post-meta" style="display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-top:0.5rem;">
+                        {% if post.user_id != session.user_id %}
                         <form action="{{ url_for('rate_post', post_id=post.id) }}" method="post" style="display:flex; align-items:center; gap:0.5rem;">
                             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
                             <label for="rating-{{ post.id }}">Rate:</label>
@@ -157,7 +158,12 @@
                                 {% endfor %}
                             </select>
                             <button type="submit">Save</button>
+                            <br>
+                            <br>
                         </form>
+                        {% else %}
+                        <p><em>You cannot rate your own post</em></p>
+                        {% endif %} 
                 
                     <div class="rating-stats" style="text-align:right; min-width:120px;">
                         {% if post.avg_rating is not none %}
@@ -168,7 +174,7 @@
                         {% endif %}
                     </div>
                 </div>
-                <br>
+
                 <div style="display:flex; align-items:center; gap:8px;">
                     <form action="{{ url_for('like_post', post_id=post.id) }}?from={{ request.path }}%23post-{{ post.id }}" method="post">
                         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">

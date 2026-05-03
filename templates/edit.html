@@ -27,6 +27,34 @@
         <input id="song" type="text" name="song" value="{{ post.song }}" required>
       </p>
       <p>
+        <label for="genre">Genre:</label><br>
+        <select id="genre" name="genre" required>
+          <option value="Pop" {% if post.genre == "Pop" %}selected{% endif %}>Pop</option>
+          <option value="Rock" {% if post.genre == "Rock" %}selected{% endif %}>Rock</option>
+          <option value="Rap" {% if post.genre == "Rap" %}selected{% endif %}>Rap</option>
+          <option value="Jazz" {% if post.genre == "Jazz" %}selected{% endif %}>Jazz</option>
+          <option value="R&B" {% if post.genre == "R&B" %}selected{% endif %}>R&B</option>
+          <option value="Country" {% if post.genre == "Country" %}selected{% endif %}>Country</option>
+          <option value="Electronic" {% if post.genre == "Electronic" %}selected{% endif %}>Electronic</option>
+          <option value="Classical" {% if post.genre == "Classical" %}selected{% endif %}>Classical</option>
+          <option value="Mixed" {% if post.genre == "Mixed" %}selected{% endif %}>Mixed</option>
+        </select>
+      </p>
+      <p>
+        <label for="mood">Mood:</label><br>
+        <select id="mood" name="mood" required>
+          <option value="Upbeat" {% if post.mood == "Upbeat" %}selected{% endif %}>Upbeat</option>
+          <option value="Sad" {% if post.mood == "Sad" %}selected{% endif %}>Sad</option>
+          <option value="Relaxing" {% if post.mood == "Relaxing" %}selected{% endif %}>Relaxing</option>
+          <option value="Aggressive" {% if post.mood == "Aggressive" %}selected{% endif %}>Aggressive</option>
+          <option value="Dreamy" {% if post.mood == "Dreamy" %}selected{% endif %}>Dreamy</option>
+          <option value="Cozy" {% if post.mood == "Cozy" %}selected{% endif %}>Cozy</option>
+          <option value="Romantic" {% if post.mood == "Romantic" %}selected{% endif %}>Romantic</option>
+          <option value="Focused" {% if post.mood == "Focused" %}selected{% endif %}>Focused</option>
+          <option value="Sleepy" {% if post.mood == "Sleepy" %}selected{% endif %}>Sleepy</option>
+        </select>
+      </p>
+      <p>
         <label for="comment">Comment:</label>
         <br>
         <textarea id="comment" name="comment" rows="5" cols="40">{{ post.comment }}</textarea>
