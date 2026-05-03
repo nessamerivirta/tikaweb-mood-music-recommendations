@@ -9,7 +9,13 @@
 
 <body>
   <div class="container">
+    <div class="topbar" style="justify-content: flex-end;">
+      <a href="{{ url_for('index') }}">Never mind</a>
+    </div>
     <h1>Create an account</h1>
+    {% if error %}
+    <p style="color:red;">{{ error }}</p>
+    {% endif %}
     <form action="/create" method="post">
       <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
       <p>
