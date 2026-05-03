@@ -15,6 +15,11 @@
             <h2>Are you ready to explore new music?</h2>
         </div>
         <hr>
+        {% if request.args.get("registered") %}
+            <p style="color:rgb(150, 240, 150);">
+                Account created successfully! Login to access all features.
+            </p>
+        {% endif %}
         <div class="nav">
             <p>
                 Please, log in or register a new account to share your taste
