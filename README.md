@@ -11,8 +11,8 @@ Toiminnot:
 - Käyttäjä pystyy hakemaan biisin nimeä, artistia tai genreä, mutta tärkeimpänä sovelluksen ominaisuutena, ehdotuksia tunnelman mukaan
 - Biisi tai artisti haetaan vapaalla hakusanalla kun taas genre ja tunnelma valitsemalla valmis luokka
 - Käyttäjät voivat myös lisätä arvosteluja (arvosana 1-10 sekä kommentti).
-- Käyttäjät pystyvät tykkäämään biiseistä ja biisit voidaan järjestää haussa tykkäysten määrän perusteella
-- Käyttäjäsivulla näkyy käyttäjän lisätyt biisit sekä arvostelut
+- Käyttäjät pystyvät tykkäämään biiseistä ja biisit järjestetään haussa tykkäysten määrän perusteella
+- Käyttäjäsivulla näkyy käyttäjän lisätyt biisit sekä niiden tykkäykset ja arvostelut
 
 Pääasiallinen tietokohde on musiikkiehdotus ja toissijainen tietokohde on arvostelu. Tyk¢käykset lisäominaisuutena
 
