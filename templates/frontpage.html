@@ -128,7 +128,7 @@
                 <p>
                     <strong>{{ post.username }}</strong> – {{ post.artist }} / {{ post.song }} - {{post.genre}} - {{post.mood}} <br>
                     <br>
-                    {{ post.comment }}<br>
+                    {{ post.comment | replace('\n', '<br>') | safe }}<br>
                     <br>
                     {% if post.image_path %}
                         <img src="/{{ post.image_path }}" alt="Cover" width="200"><br>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Search</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}"
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
 </head>
 <body>
     <div class="container">
@@ -62,7 +62,7 @@
                 <li id="post-{{ result.id }}">
                     <strong>{{ result.username }}</strong> – {{ result.artist }} / {{ result.song }} - {{result.genre}} - {{ result.mood }}<br>
                     <br>
-                    {{ result.comment}}<br>
+                    {{ result.comment | replace('\n', '<br>') | safe }}<br>
                     <br>
                     {% if result.image_path %}
                         <img src="{{ result.image_path }}" width="200"><br>
