@@ -96,21 +96,20 @@ def remove_post(post_id):
     db.execute(sql, [post_id])
 
 def update_post(post_id, artist, song, comment, image_path=None, genre=None, mood=None):
-    if image_path is not None and genre is not None and mood is not None:
-        sql = "UPDATE posts SET artist = ?, song = ?, comment = ?, image_path = ?, genre = ?, mood = ? WHERE id = ?"
-        db.execute(sql, [artist, song, comment, image_path, genre, mood, post_id])
-    elif image_path is not None:
-        sql = "UPDATE posts SET artist = ?, song = ?, comment = ?, image_path = ? WHERE id = ?"
-        db.execute(sql, [artist, song, comment, image_path, post_id])
-    elif genre is not None:
-        sql = "UPDATE posts SET artist = ?, song = ?, comment = ?, genre = ? WHERE id = ?"
-        db.execute(sql, [artist, song, comment, genre, post_id])
-    elif mood is not None:
-        sql = "UPDATE posts SET artist = ?, song = ?, comment = ?, mood = ? WHERE id = ?"
-        db.execute(sql, [artist, song, comment, mood, post_id])
-    else:
-        sql = "UPDATE posts SET artist = ?, song = ?, comment = ? WHERE id = ?"
-        db.execute(sql, [artist, song, comment, post_id])
+    sql = """
+        UPDATE posts
+        SET artist = ?, song = ?, comment = ?, genre = ?, mood = ?
+    """
+    params = [artist, song, comment, genre, mood]
+
+    if image_path is not None:
+        sql += ", image_path = ?"
+        params.append(image_path)
+
+    sql += " WHERE id = ?"
+    params.append(post_id)
+
+    db.execute(sql, params)
 
 def search_songs(query=None, genre=None, mood=None):
     base_sql = """
