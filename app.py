@@ -4,6 +4,7 @@ from flask import redirect, render_template, request, session
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
+from datetime import datetime, timezone
 import uuid
 import os
 import db
@@ -147,7 +148,7 @@ def create():
     except sqlite3.IntegrityError:
         return render_template("register.html", error="Username is taken", username=username)
 
-    return redirect("/")
+    return redirect("/?registered=1")
 
 @app.route("/logout")
 def logout():
@@ -172,6 +173,8 @@ def edit_post(post_id):
 
     artist = request.form["artist"]
     song = request.form["song"]
+    genre = request.form["genre"]
+    mood = request.form["mood"]
     comment = request.form["comment"]
  
     image_file = request.files.get("image")
@@ -182,9 +185,9 @@ def edit_post(post_id):
         os.makedirs('static/uploads', exist_ok=True)
         image_path = os.path.join('static/uploads', filename)
         image_file.save(image_path)
-        forum.update_post(post_id, artist, song, comment, image_path=image_path)
+        forum.update_post(post_id, artist, song, comment, image_path=image_path, genre=genre, mood=mood)
     else:
-        forum.update_post(post_id, artist, song, comment)
+        forum.update_post(post_id, artist, song, comment, genre=genre, mood=mood)
 
     return redirect("/frontpage")
 
