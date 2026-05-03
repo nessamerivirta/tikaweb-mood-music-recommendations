@@ -4,6 +4,7 @@ from flask import redirect, render_template, request, session
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
+import uuid
 import os
 import db
 import config
@@ -91,6 +92,8 @@ def frontpage():
             posts = forum.get_posts()
             uid = session.get("user_id")
             posts = enrich_posts_with_likes_and_ratings(posts, uid)
+            genres = forum.get_genre()
+            moods = forum.get_mood()
             return render_template(
                 "frontpage.html",
                 posts=posts,
@@ -101,8 +104,8 @@ def frontpage():
 
         image_file = request.files.get("image")
         image_path = None
-        if image_file:
-            filename = secure_filename(image_file.filename)
+        if image_file and image_file.filename:
+            filename = f"{uuid.uuid4().hex}_{secure_filename(image_file.filename)}"
             os.makedirs('static/uploads', exist_ok=True)
             image_path = os.path.join('static/uploads', filename)
             image_file.save(image_path)
@@ -115,7 +118,10 @@ def frontpage():
     posts = forum.get_posts()
     uid = session.get("user_id")
     posts = enrich_posts_with_likes_and_ratings(posts, uid)
-    return render_template("frontpage.html", posts=posts, username=session.get("username"))
+
+    genres = forum.get_genre()
+    moods = forum.get_mood()
+    return render_template("frontpage.html", posts=posts, username=session.get("username"), genres=genres, moods=moods)
 
 @app.route("/create", methods=["POST"])
 def create():
@@ -127,6 +133,12 @@ def create():
         return render_template("register.html", error="Username and password are required", username=username)
     if password1 != password2:
         return render_template("register.html", error="Passwords do not match", username=username)
+    if len(password1) < 6:
+        return render_template(
+        "register.html",
+        error="Password must contain at least 6 characters",
+        username=username
+        )
     password_hash = generate_password_hash(password1)
 
     try:
